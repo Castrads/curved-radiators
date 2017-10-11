@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Curved radiators</title>
+    <!--Import Google Icon Font-->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!--Import materialize.css-->
+    <link type="text/css" rel="stylesheet" href="bower_components/materialize/dist/css/materialize.min.css"  media="screen,projection"/>
+    <!--Let browser know website is optimized for mobile-->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+</head>
+
+<body>
+
+    <div class="row">
+        <form class="col s4">
+
+            <h4>1. Radiator</h4>
+
+            <div class="row">
+                <div class="input-field col s12">
+                    <select>
+                        <option value="" disabled selected>Choose radiator</option>
+                        <option value="1">4 Column 760mm</option>
+                        <option value="2">4 Column 760mm</option>
+                        <option value="3">4 Column 760mm</option>
+                        <option value="4">4 Column 760mm</option>
+                    </select>
+                    <label>Radiator</label>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="input-field col s12">
+                    <label for="sections">Number of sections</label>
+                    <input type="number" name="sections" value="11" min="10" max="40">
+                    <p>Work out the size of your straight radiator minimum of 10 sections and maximum of 40 sections</p>
+                </div>
+            </div>
+
+            <h4>2. Curve</h4>
+
+            <p>
+                <input type="checkbox" id="curved-cb"/>
+                <label for="curved-cb">Curved radiator</label>
+            </p>
+
+            <div class="hide" id="curved-form">
+                <div class="row">
+                    <p class="col s12">
+                        <input type="radio" name="curve" id="external" value="external" checked>
+                        <label for="external">External curve</label>
+                    </p>
+                    <p class="col s12">
+                        <input type="radio" name="curve" id="internal" value="internal">
+                        <label for="internal">Internal curve</label>
+                    </p>
+                </div>
+
+                <div class="row">
+                    <div class="input-field col s12">
+                        <label for="width">Width (the Chord) (mm)</label>
+                        <input type="number" name="width" min="0" value="780">
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="input-field col s12">
+                        <label for="depth">Depth (the Camber) (mm)</label>
+                        <input type="number" name="depth" min="0" value="0">
+                    </div>
+                </div>
+            </div>
+
+            <h4>3. Summary</h4>
+
+        </form>
+
+        <div class="col s8">
+            <h5>Preview:</h5>
+            <div id="drawing"></div>
+            <div id="instructions-internal" class="hide">
+                <ol type="A">
+                    <li>Measure the width of the curve (known as the chord, Dimension A on the drawing above)</li>
+                    <li>From the centre of the bay measure the distance to the skirting board if present (known as the camber, dimension B shown above)</li>
+                </ol>
+            </div>
+            <div id="instructions-external">
+                <ol type="A">
+                    <li>Measure the width of the bay (this is called the Chord, Dimension A shown above)</li>
+                    <li>Measure the depth of the column, use a straight edge and a spirit level to help if needed, to measure the depth (known as the camber) of the curve. Measure both sides of the curve to check they are consistent.</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+
+    <!--Import jQuery before materialize.js-->
+    <script type="text/javascript" src="bower_components/jquery/dist/jquery.min.js"></script>
+    <script type="text/javascript" src="bower_components/svg.js/dist/svg.min.js"></script>
+    <script type="text/javascript" src="bower_components/svg.path/svg.path.js"></script>
+    <script type="text/javascript" src="bower_components/materialize/dist/js/materialize.min.js"></script>
+    <script type="text/javascript" src="js/script.js"></script>
+</body>
+</html>
