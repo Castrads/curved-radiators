@@ -20,20 +20,25 @@
             <div class="row">
                 <div class="input-field col s12">
                     <select>
-                        <option value="" disabled selected>Choose radiator</option>
-                        <option value="1">4 Column 760mm</option>
-                        <option value="2">4 Column 760mm</option>
-                        <option value="3">4 Column 760mm</option>
-                        <option value="4">4 Column 760mm</option>
+                        <option value="" disabled>Choose radiator</option>
                     </select>
                     <label>Radiator</label>
                 </div>
             </div>
 
             <div class="row">
-                <div class="input-field col s12">
+                <div class="col s12" style="margin-bottom: 10px;">
+                    <strong>Enter required number of sections or radiator length:</strong>
+                </div>
+                <div class="input-field col s6">
                     <label for="sections">Number of sections</label>
                     <input type="number" name="sections" value="11" min="10" max="40">
+                </div>
+                <div class="input-field col s6">
+                    <label for="radiator-length">Radiator length (mm)</label>
+                    <input type="number" name="radiator-length" min="0">
+                </div>
+                <div class="col s12">
                     <p>Work out the size of your straight radiator minimum of 10 sections and maximum of 40 sections</p>
                 </div>
             </div>
@@ -42,7 +47,7 @@
 
             <p>
                 <input type="checkbox" id="curved-cb"/>
-                <label for="curved-cb">Curved radiator</label>
+                <label for="curved-cb">Is this curved radiator?</label>
             </p>
 
             <div class="hide" id="curved-form">
@@ -71,8 +76,6 @@
                     </div>
                 </div>
             </div>
-
-            <h4>3. Summary</h4>
 
         </form>
 
