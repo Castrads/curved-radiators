@@ -240,10 +240,16 @@ $(document).ready(function() {
     $("#curved-cb").on('change', function() {
         if ($(this).prop('checked')) {
             $("#curved-form").removeClass('hide');
+            $("#radiator-placeholder").hide();
+            $("#drawing").show();
+            $(".instructions").show();
             depth.val(depthDefault);
             render();
         } else {
             $("#curved-form").addClass('hide');
+            $("#radiator-placeholder").show();
+            $(".instructions").hide();
+            $("#drawing").hide();
             depth.val(0);
             render();
         }
@@ -268,6 +274,6 @@ $(document).ready(function() {
 
     length.val(sections.val() * radiator.length);
 
-    render();
+    //render();
 
 });
