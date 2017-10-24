@@ -1,7 +1,7 @@
 $(document).ready(function() {
 
     var mmToPxRatio = 3;
-    var depthDefault = 500;
+    var depthDefault = 300;
 
     var width = $("input[name='width']");
     var depth = $("input[name='depth']");
