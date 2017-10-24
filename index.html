@@ -8,6 +8,17 @@
     <link type="text/css" rel="stylesheet" href="bower_components/materialize/dist/css/materialize.min.css"  media="screen,projection"/>
     <!--Let browser know website is optimized for mobile-->
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+    <style media="screen">
+        ul.inline {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+        }
+        ul.inline li {
+            float: left;
+        }
+    </style>
 </head>
 
 <body>
@@ -41,7 +52,7 @@
                         </div>
                         <div class="input-field col s6">
                             <label for="sections">Number of sections</label>
-                            <input type="number" name="sections" value="11" min="10" max="40">
+                            <input type="number" name="sections" value="10" min="10" max="40">
                         </div>
                         <div class="input-field col s6">
                             <label for="radiator-length">Radiator length (mm)</label>
@@ -76,7 +87,7 @@
                         <div class="row">
                             <div class="input-field col s12">
                                 <label for="width">Width (the Chord) (mm)</label>
-                                <input type="number" name="width" min="0" value="780">
+                                <input type="number" name="width" min="0" value="1000">
                             </div>
                         </div>
 
@@ -119,25 +130,40 @@
         <div class="col s8">
             <h5>Preview:</h5>
 
-            <div id="radiator-placeholder">
-                <img src="images/radiator-placeholder.png" alt="Placeholder">
+            <div class="row">
+                <div class="col s12">
+                    <div id="drawing" class="hide"></div>
+
+                </div>
             </div>
 
-            <div id="drawing"></div>
+            <div class="row">
+                <div id="radiator-placeholder" class="col s12">
+                    <div style="justify-content: center; display: flex;">
+                        <ul class="inline center-align"></ul>
+                    </div>
+                </div>
 
-            <div id="instructions-internal" class="hide instructions">
-                <ol type="A">
-                    <li>Measure the width of the curve (known as the chord, Dimension A on the drawing above)</li>
-                    <li>From the centre of the bay measure the distance to the skirting board if present (known as the camber, dimension B shown above)</li>
-                </ol>
             </div>
 
-            <div id="instructions-external" class="instructions">
-                <ol type="A">
-                    <li>Measure the width of the bay (this is called the Chord, Dimension A shown above)</li>
-                    <li>Measure the depth of the column, use a straight edge and a spirit level to help if needed, to measure the depth (known as the camber) of the curve. Measure both sides of the curve to check they are consistent.</li>
-                </ol>
+            <div class="row">
+                <div class="instructions hide">
+                    <div id="instructions-internal" class="hide">
+                        <ol type="A">
+                            <li>Measure the width of the curve (known as the chord, Dimension A on the drawing above)</li>
+                            <li>From the centre of the bay measure the distance to the skirting board if present (known as the camber, dimension B shown above)</li>
+                        </ol>
+                    </div>
+
+                    <div id="instructions-external">
+                        <ol type="A">
+                            <li>Measure the width of the bay (this is called the Chord, Dimension A shown above)</li>
+                            <li>Measure the depth of the column, use a straight edge and a spirit level to help if needed, to measure the depth (known as the camber) of the curve. Measure both sides of the curve to check they are consistent.</li>
+                        </ol>
+                    </div>
+                </div>
             </div>
+
         </div>
     </div>
 

@@ -1,7 +1,7 @@
 $(document).ready(function() {
 
     var mmToPxRatio = 3;
-    var depthDefault = 250;
+    var depthDefault = 500;
 
     var width = $("input[name='width']");
     var depth = $("input[name='depth']");
@@ -9,7 +9,7 @@ $(document).ready(function() {
     var curve = $("input[name='curve']");
     var length = $("input[name='radiator-length']");
     var select = $("select");
-    var drawingWidth = $("#drawing").width();
+    var drawingWidth = $("#drawing").parent().width();
     var drawingHeight = 1000 / mmToPxRatio;
 
     var draw = SVG('drawing').size(drawingWidth, drawingHeight);
@@ -177,16 +177,25 @@ $(document).ready(function() {
 
     function renderRadiator(path, sections, w = getWidth()) {
 
-        for (var i = 1; i <= sections; i++) {
+        var rw = (radiator.length / mmToPxRatio);
+        var rh = 36;
+        var center = (path.length()/2);
 
-            var rw = (radiator.length / mmToPxRatio);
-            var rh = 36;
+        if (sections%2 == 0) {
+            center -= (rw/5) * 2;
+        }
 
-            var section = draw.image(radiator.imageURL, rw, rh)
-            var centerMove = (w - rw * sections) / 2;
-            var pos = path.pointAt((rw * i) + centerMove);
+        for (var i = 0; i < sections; i++) {
 
-            section.move((drawingWidth - getWidth()) / 2 + ((rw * i) + centerMove - rw), parseInt(pos.y) + 10);
+            var section = draw.image(radiator.imageURL, rw, rh);
+
+            if (i%2 == 0) {
+                c = path.pointAt(center - ((i/2) * rw));
+            } else {
+                c = path.pointAt(center + ((i - Math.floor(i/2)) * rw));
+            }
+
+            section.move(c.x - rw/2, c.y + 10);
         }
     }
 
@@ -202,6 +211,22 @@ $(document).ready(function() {
         renderRadiator(renderPath(), sections.val());
     }
 
+    function renderRadiatorPreview (sections) {
+        var list = $("#radiator-placeholder ul").empty();
+        var left = $("<li/>").append($("<img/>").attr("src", "images/radiators/left-leg.jpg"));
+        var right = $("<li/>").append($("<img/>").attr("src", "images/radiators/right-leg.jpg"));
+
+        var mids = sections - 2;
+
+        list.append(left);
+
+        for (var i = 0; i < mids; i++) {
+            list.append($("<li/>").append($("<img/>").attr("src", "images/radiators/mid-section.jpg")));
+        }
+
+        list.append(right);
+    }
+
     depth.on('change', render);
     depth.on('change', render);
 
@@ -209,11 +234,14 @@ $(document).ready(function() {
         var maxSection = getMaxSections($(this).val());
 
         if (sections.val() > maxSection) {
+
             if (maxSection > 10) {
                 sections.val(maxSection);
             } else {
                 sections.val(10);
             }
+
+            renderRadiatorPreview(sections.val());
         }
 
         render();
@@ -230,6 +258,7 @@ $(document).ready(function() {
         length.val(radiatorLength);
 
         render();
+        renderRadiatorPreview(sections.val());
     });
 
     select.on('change', function() {
@@ -240,16 +269,14 @@ $(document).ready(function() {
     $("#curved-cb").on('change', function() {
         if ($(this).prop('checked')) {
             $("#curved-form").removeClass('hide');
-            $("#radiator-placeholder").hide();
-            $("#drawing").show();
-            $(".instructions").show();
+            $("#drawing").removeClass('hide');
+            $(".instructions").removeClass('hide');
             depth.val(depthDefault);
             render();
         } else {
             $("#curved-form").addClass('hide');
-            $("#radiator-placeholder").show();
-            $(".instructions").hide();
-            $("#drawing").hide();
+            $(".instructions").addClass('hide');
+            $("#drawing").addClass('hide');
             depth.val(0);
             render();
         }
@@ -270,10 +297,12 @@ $(document).ready(function() {
     length.on('change', function() {
         var s = Math.floor($(this).val() / radiator.length)
         sections.val(s);
+        renderRadiatorPreview(s);
     })
 
     length.val(sections.val() * radiator.length);
 
     //render();
+    renderRadiatorPreview(sections.val());
 
 });
