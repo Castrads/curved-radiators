@@ -1,7 +1,7 @@
 $(document).ready(function() {
 
     var mmToPxRatio = 3;
-    var depthDefault = 250;
+    // var depthDefault = 100;
 
     var width = $("input[name='width']");
     var depth = $("input[name='depth']");
@@ -9,20 +9,24 @@ $(document).ready(function() {
     var curve = $("input[name='curve']");
     var length = $("input[name='radiator-length']");
     var select = $("select");
-    var drawingWidth = $("#drawing").width();
-    var drawingHeight = 1000 / mmToPxRatio;
+    var drawingWidth = $("#drawing").parent().width();
+    var drawingHeight = 500 / mmToPxRatio;
+    var valvesLength = 100;
 
     var draw = SVG('drawing').size(drawingWidth, drawingHeight);
 
-    var radiators = [{
-            name: '4 Column 460mm',
+    var radiators = [
+        {
+            name: '3 Column',
             length: 61,
-            imageURL: 'images/radiators/4-column-460mm.png'
+            imageURL: 'images/radiators/4-column-460mm.png',
+            minSections: 22
         },
         {
-            name: 'Duchess 590mm',
+            name: '4 Column',
             length: 71,
-            imageURL: 'images/radiators/duches-590mm.png'
+            imageURL: 'images/radiators/duches-590mm.png',
+            minSections: 29
         }
     ]
 
@@ -41,7 +45,7 @@ $(document).ready(function() {
     }
 
     function startY() {
-        return (getCurveType() == 'internal') ? getDepth() : 50;
+        return getDepth() + 20;
     }
 
     function getWidth() {
@@ -53,7 +57,7 @@ $(document).ready(function() {
     }
 
     function getMaxSections(width) {
-        return parseInt(width / radiator.length);
+        return parseInt(width - valvesLength / radiator.length);
     }
 
     function getArrowPath(width = 10, height = 10) {
@@ -71,47 +75,20 @@ $(document).ready(function() {
         return pattern;
     }
 
-    function getCurveType() {
-        return $("input[name='curve']:checked").val();
+    function getRadius(w = getWidth(), d = getDepth()) {
+        return parseInt((Math.pow(d, 2) + Math.pow(w/2, 2)) / (2 * d));
     }
 
     function renderPath(w = getWidth(), d = getDepth()) {
-        var path = draw.path()
+        var radius = getRadius(w, d)
+        var path = draw.path(`M ${startX()} ${startY()} A ${radius} ${radius} 0 0 1 ${startX() + w} ${startY()}`).fill('#fff');
 
-        if (getCurveType() == 'external') {
-
-            path.M(startX(), startY()).c({
-                x: 0,
-                y: 0
-            }, {
-                x: w / 2,
-                y: d
-            }, {
-                x: w,
-                y: 0
-            }).fill(getDiagonalLinesPattern())
-
-            // Depth line
-            renderDepthLines(draw, path.pointAt(w / 2).y, w, d, true);
-
-        } else {
-            path.M(startX(), startY()).c({
-                x: 0,
-                y: 0
-            }, {
-                x: w / 2,
-                y: d * (-1)
-            }, {
-                x: w,
-                y: 0
-            }).fill('#fff')
-
-            // Depth line
-            renderDepthLines(draw, path.pointAt(w / 2).y, w, d, false);
-        }
+        // Depth line
+        renderDepthLines(draw, path.pointAt(path.length() / 2).y, w, d, false);
 
         if (d) {
-            var peak = path.pointAt(w / 2).y
+
+            var peak = path.pointAt(path.length() / 2).y
 
             // Left size line
             draw.line(startX(), startY(), startX(), startY() + peak).stroke({
@@ -177,85 +154,70 @@ $(document).ready(function() {
 
     function renderRadiator(path, sections, w = getWidth()) {
 
-        for (var i = 1; i <= sections; i++) {
+        var rw = parseInt(radiator.length / mmToPxRatio);
+        var rh = 36;
+        var center = path.length()/2;
+        var p = 0;
 
-            var rw = (radiator.length / mmToPxRatio);
-            var rh = 36;
+        if (sections%2 == 0) {
+            center -= (rw/5) * 2;
+        }
 
-            var section = draw.image(radiator.imageURL, rw, rh)
-            var centerMove = (w - rw * sections) / 2;
-            var pos = path.pointAt((rw * i) + centerMove);
+        for (var i = 0; i < sections; i++) {
 
-            section.move((drawingWidth - getWidth()) / 2 + ((rw * i) + centerMove - rw), parseInt(pos.y) + 10);
+            var section = draw.image(radiator.imageURL, rw, rh);
+
+            if (i%2 == 0) {
+                p = center - ((i/2) * rw);
+            } else {
+                p = center + ((i - Math.floor(i/2)) * rw);
+            }
+
+            c = path.pointAt(parseInt(p));
+
+            section.center(c.x, c.y + 20);
         }
     }
 
     function render() {
         draw.clear();
 
-        draw.rect(drawingWidth, startY()).fill(getDiagonalLinesPattern());
-        draw.line(0, startY(), drawingWidth, startY()).stroke({
-            color: '#000',
-            width: 1
-        })
-
-        renderRadiator(renderPath(), sections.val());
+        if (getDepth() > 0) {
+            draw.rect(drawingWidth, startY()).fill(getDiagonalLinesPattern());
+            renderRadiator(renderPath(), sections.val());
+        }
     }
 
-    depth.on('change', render);
-    depth.on('change', render);
+    function renderRadiatorPreview (sections) {
+        var list = $("#radiator-placeholder ul").empty();
+        var left = $("<li/>").append($("<img/>").attr("src", "images/radiators/left-leg.jpg"));
+        var right = $("<li/>").append($("<img/>").attr("src", "images/radiators/right-leg.jpg"));
 
-    width.on('change', function() {
-        var maxSection = getMaxSections($(this).val());
+        var mids = sections - 2;
 
-        if (sections.val() > maxSection) {
-            if (maxSection > 10) {
-                sections.val(maxSection);
-            } else {
-                sections.val(10);
-            }
+        list.append(left);
+
+        for (var i = 0; i < mids; i++) {
+            list.append($("<li/>").append($("<img/>").attr("src", "images/radiators/mid-section.jpg")));
         }
 
-        render();
-    });
+        list.append(right);
+    }
 
-    sections.on('change', function() {
-        var radiatorLength = $(this).val() * radiator.length;
-        var minWidth = radiatorLength + 120;
+    function init() {
+        // length.val(sections.val() * radiator.length + valvesLength);
+        sections.change();
+        renderRadiatorPreview(sections.val());
+    }
 
-        if (width.val() < minWidth) {
-            width.val(minWidth);
+    depth.on('change', function() {
+
+        if ($(this).attr('max') !== undefined && $(this).attr('max') < $(this).val()) {
+            $(this).val($(this).attr('max'));
         }
 
-        length.val(radiatorLength);
-
-        render();
-    });
-
-    select.on('change', function() {
-        radiator = radiators[$(this).val()];
-        render();
-    })
-
-    $("#curved-cb").on('change', function() {
-        if ($(this).prop('checked')) {
-            $("#curved-form").removeClass('hide');
-            depth.val(depthDefault);
-            render();
-        } else {
-            $("#curved-form").addClass('hide');
-            depth.val(0);
-            render();
-        }
-    });
-
-    curve.on('change', function() {
-        if (getCurveType() == 'internal') {
-            $("#instructions-internal").removeClass('hide');
-            $("#instructions-external").addClass('hide');
-        } else {
-            $("#instructions-internal").addClass('hide');
-            $("#instructions-external").removeClass('hide');
+        if ($(this).attr('max') == undefined && getRadius() < $(this).val()) {
+            $(this).val(getRadius());
         }
 
         render();
@@ -264,10 +226,77 @@ $(document).ready(function() {
     length.on('change', function() {
         var s = Math.floor($(this).val() / radiator.length)
         sections.val(s);
-    })
+        renderRadiatorPreview(s);
+    });
 
-    length.val(sections.val() * radiator.length);
+    width.on('change', function() {
+        var maxSection = getMaxSections($(this).val());
 
-    render();
+        if (sections.val() > maxSection) {
+
+            if (maxSection > 10) {
+                sections.val(maxSection);
+            } else {
+                sections.val(10);
+            }
+
+            renderRadiatorPreview(sections.val());
+        }
+
+        depth.attr('max', getRadius());
+
+        render();
+    });
+
+    sections.on('change', function() {
+
+        if ($(this).val() > 40) {
+            $(this).val(40);
+        }
+
+        if ($(this).attr('min') !== undefined && $(this).attr('min') > $(this).val()) {
+            $(this).val($(this).attr('min'));
+        }
+
+        var radiatorLength = $(this).val() * radiator.length;
+        var minWidth = radiatorLength + valvesLength;
+
+        if (width.val() < minWidth) {
+            width.val(minWidth);
+        }
+
+        length.val(minWidth);
+        depth.attr('max', getRadius());
+
+        render();
+        renderRadiatorPreview(sections.val());
+    });
+
+    select.on('change', function() {
+        radiator = radiators[$(this).val()];
+        sections.attr('min', radiator.minSections).change();
+
+        if (sections.val() < radiator.minSections) {
+            sections.val(radiator.minSections);
+        }
+        render();
+    });
+
+    $("#curved-cb").on('change', function() {
+        if ($(this).prop('checked')) {
+            $("#curved-form").removeClass('hide');
+            $(".instructions").removeClass('hide');
+            $("#drawing").removeClass('hide');
+            sections.val(radiator.minSections).attr('min', radiator.minSections).change();
+            render();
+        } else {
+            $("#curved-form").addClass('hide');
+            $(".instructions").addClass('hide');
+            $("#drawing").addClass('hide');
+            render();
+        }
+    });
+
+    init();
 
 });
